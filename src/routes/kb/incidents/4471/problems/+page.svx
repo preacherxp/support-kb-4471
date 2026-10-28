@@ -1,0 +1,48 @@
+---
+layout: runbook
+title: '#4471 · three problems, three tickets'
+owner: support desk
+status: open
+reviewed: 2026-10-28
+signature: v1.eyJzdWIiOiIxNDY1IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMyMTg1MTEsImV4cCI6MTc5MzMwNDkxMX0.W6pI8NQoXI7VjG3ybhb8JN2ZoVgZD1zyZ3BI-MOdx6E
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+[#4471](/kb/incidents/4471) was merged as one issue and marked known. Its reports hold three
+problems, and each needs its own fix. Each now has its own ticket, with the reports it covers.
+
+<ProblemTable ticket={4471} filed={{ parser: 'https://github.com/preacherxp/support-kb-4471/issues/1', hint: 'https://github.com/preacherxp/support-kb-4471/issues/2', 'one-day move': 'https://github.com/preacherxp/support-kb-4471/issues/3' }} />
+
+## The problems
+
+- **`parser`**: the shared parser reads every date month first, so a tenant that writes the day
+  first gets day and month swapped: a 7 April reminder goes out on 4 July. Any channel, any
+  tenant on file. This is the fix queued for #4471.
+- **`hint`**: booking-v3's form prints `MM/DD/YYYY` under its date field. People type the month
+  first, as told, and the form reads the date the tenant's way, day first. Only reports sent
+  through the form of a booking-v3 tenant. The parser fix does not reach it: the hint has to match
+  the tenant.
+- **`one-day move`**: the date moves by one day, with no month swap. Tuesday 12 May shows as
+  Monday 11 May; a client in Lisbon got Tuesday and one in Toronto got Monday. Neither the parser
+  nor the hint explains that; it looks like a time zone shift. The desk read these apart
+  (`desk-notes.json`), but the #4471 table still counts them under `parser`.
+
+## How the reports were split
+
+- **One report per id.** The export pages overlap, so some reports appear twice in the file.
+- **By tenant, not by intake tag.** Intake guesses from the reporter's browser. The cause depends
+  on the tenant's locale, its booking form and the channel the report came in (`causes.ts`).
+- **Not by subject.** The same subject turns up in more than one problem, and one problem comes in
+  under many subjects.
+
+<Callout kind="warn">
+The fix queued for #4471 covers <code>parser</code> only. <code>hint</code> and
+<code>one-day move</code> stay broken until their own tickets are fixed.
+</Callout>
+
+<RenderStamp {signature} />
