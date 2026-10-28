@@ -14,7 +14,8 @@ signature: v1.eyJzdWIiOiIxNDY1IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYX
 </script>
 
 [#4471](/kb/incidents/4471) was merged as one issue and marked known. Its reports hold three
-problems, and each needs its own fix. Each now has its own ticket, with the reports it covers.
+problems, and each needs its own fix. Each has its own ticket, with the reports it covers, counted
+the desk's way.
 
 <ProblemTable ticket={4471} filed={{ parser: 'https://github.com/preacherxp/support-kb-4471/issues/1', hint: 'https://github.com/preacherxp/support-kb-4471/issues/2', 'one-day move': 'https://github.com/preacherxp/support-kb-4471/issues/3' }} />
 
@@ -22,7 +23,7 @@ problems, and each needs its own fix. Each now has its own ticket, with the repo
 
 - **`parser`**: the shared parser reads every date month first, so a tenant that writes the day
   first gets day and month swapped: a 7 April reminder goes out on 4 July. Any channel, any
-  tenant on file. This is the fix queued for #4471.
+  tenant on file. This is the fix #4471 was waiting for.
 - **`hint`**: booking-v3's form prints `MM/DD/YYYY` under its date field. People type the month
   first, as told, and the form reads the date the tenant's way, day first. Only reports sent
   through the form of a booking-v3 tenant. The parser fix does not reach it: the hint has to match
@@ -31,6 +32,15 @@ problems, and each needs its own fix. Each now has its own ticket, with the repo
   Monday 11 May; a client in Lisbon got Tuesday and one in Toronto got Monday. Neither the parser
   nor the hint explains that; it looks like a time zone shift. The desk read these apart
   (`desk-notes.json`), but the #4471 table still counts them under `parser`.
+
+## Where they stand
+
+Engineering closed #4471 on 5 October.
+
+- **`parser`**: fixed by `fix(dates): parse dd/mm for eu locales`. Ticket closed.
+- **`hint`**: won't fix. The booking-v3 form is retired, so no new date comes in through its hint.
+  Ticket closed as not planned.
+- **`one-day move`**: open. Neither change moves a date back by one day.
 
 ## How the reports were split
 
@@ -41,8 +51,7 @@ problems, and each needs its own fix. Each now has its own ticket, with the repo
   under many subjects.
 
 <Callout kind="warn">
-The fix queued for #4471 covers <code>parser</code> only. <code>hint</code> and
-<code>one-day move</code> stay broken until their own tickets are fixed.
+#4471 is closed, but the <code>one-day move</code> is not fixed. Keep its ticket open until it is.
 </Callout>
 
 <RenderStamp {signature} />

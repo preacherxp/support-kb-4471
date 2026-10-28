@@ -4,17 +4,20 @@
   import { causeOf, uniqueById, type Report } from '#lib/kb/causes';
   import { tenantOf } from '#lib/kb/locales';
 
-  // One row per problem in a merged ticket. A report's problem is its cause by tenant (causes.ts),
-  // except the ones the desk read as a one-day move (desk-notes.json): no month/day flip explains those.
+  // One row per problem in a merged ticket, counted the desk's way (CauseTable): every report under its
+  // cause by tenant (causes.ts). The ones the desk read as a one-day move (desk-notes.json) stay counted
+  // there and also make their own row: no month/day flip explains them.
   let { ticket, filed = {} }: { ticket: number; filed?: Record<string, string> } = $props();
 
-  const problemOf = (r: Report) =>
-    notes.oneDayMove.includes(r.id) ? 'one-day move' : (causeOf(r, tenantOf(r)) ?? 'unplaced');
+  const problemsOf = (r: Report) => [
+    causeOf(r, tenantOf(r)) ?? 'unplaced',
+    ...(notes.oneDayMove.includes(r.id) ? ['one-day move'] : []),
+  ];
 
   const merged = $derived(uniqueById(reports as Report[]).filter((r) => r.mergedInto === ticket));
   const rows = $derived.by(() => {
     const by = new Map<string, Report[]>();
-    for (const r of merged) by.set(problemOf(r), [...(by.get(problemOf(r)) ?? []), r]);
+    for (const r of merged) for (const p of problemsOf(r)) by.set(p, [...(by.get(p) ?? []), r]);
     return [...by]
       .map(([problem, rs]) => {
         const days = rs.map((r) => r.receivedAt.slice(0, 10)).sort();
@@ -22,6 +25,7 @@
       })
       .sort((a, b) => b.count - a.count);
   });
+  const twice = $derived(merged.filter((r) => problemsOf(r).length > 1).length);
 </script>
 
 <p class="sum">
@@ -47,8 +51,13 @@
   </tbody>
 </table>
 
+{#if twice}
+  <p class="note">{twice} reports count twice: under their cause by tenant, where the desk files them, and as a one-day move.</p>
+{/if}
+
 <style>
   .sum { font-size: 1.1rem; }
+  .note { color: var(--muted); font-size: 0.85em; }
   .open td { background: var(--warn-bg); }
   .open td:last-child { color: var(--warn); font-weight: 600; }
 </style>
